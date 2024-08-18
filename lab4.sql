@@ -71,3 +71,51 @@ GROUP BY
     category.name
 ORDER BY 
     average_running_time DESC;
+    
+    
+    ## Bonus:
+# 5. Identify the film categories with the longest average running time.
+
+SELECT category.name AS Category, 
+	   AVG(film.length) AS Average_Run_Time
+FROM category
+JOIN film_category ON category.category_id = film_category.category_id
+JOIN film ON film_category.film_id = film.film_id
+GROUP BY category.name
+ORDER BY Average_Run_Time DESC
+LIMIT 1;
+
+# 6. Display the top 10 most frequently rented movies in descending order.
+
+SELECT film.title, 
+       COUNT(rental.rental_id) AS Rental_Count
+FROM film
+JOIN inventory ON film.film_id = inventory.film_id
+JOIN rental ON inventory.inventory_id = rental.inventory_id
+GROUP BY film.title
+ORDER BY Rental_Count DESC
+LIMIT 10;
+
+# 7. Determine if "Academy Dinosaur" can be rented from Store 1.
+
+SELECT film.title, 
+	   inventory.store_id,
+	   CASE WHEN COUNT(inventory.inventory_id) > 0 
+       THEN 'Yes' 
+       ELSE 'No' 
+       END AS Available_for_Rental
+FROM film
+JOIN inventory ON film.film_id = inventory.film_id
+WHERE film.title = 'Academy Dinosaur' AND inventory.store_id = 1
+GROUP BY film.title, inventory.store_id;
+
+# 8. Provide a list of all distinct film titles, along with their availability status in the inventory. Include a column indicating whether each title is 'Available' or 'NOT available.' Note that there are 42 titles that are not in the inventory, and this information can be obtained using a CASE statement combined with IFNULL."
+
+SELECT 
+    DISTINCT film.title,
+    CASE 
+        WHEN inventory.film_id IS NOT NULL THEN 'Available' 
+        ELSE 'NOT available' 
+    END AS availability_status
+FROM film
+LEFT JOIN inventory ON film.film_id = inventory.film_id;
